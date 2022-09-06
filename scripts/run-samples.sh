@@ -14,6 +14,9 @@ build_type=Release
 while true
 do
     case "$1" in
+        -r|--release)
+            build_type=Release
+            shift ;;
         -d|--debug)
             build_type=Debug
             shift ;;
