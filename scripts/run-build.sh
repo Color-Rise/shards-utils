@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/bash
 
-opt_short="crj:ft:"
-opt_long="cmake,rustup,jobs:,format,release,target:"
+opt_short="cfj:rt:"
+opt_long="cmake,format,jobs:,release,rustup,target:,type:"
 
 OPTS=$(getopt -o "$opt_short" -l "$opt_long" -- "$@")
 
@@ -10,9 +10,10 @@ eval set -- "$OPTS"
 # default values
 build_type=Debug
 cmake=0
-rustup=0
-jobs=10
 format=0
+jobs=8
+rustup=0
+target=shards
 
 # get args
 while true
@@ -20,20 +21,23 @@ do
     case "$1" in
         -c|--cmake)
             cmake=1
-            shift ;;
-        -r|--rustup)
-            rustup=1
-            shift ;;
+            shift;;
+        --format)
+            format=1
+            shift;;
         -j|--jobs)
             [[ ! "$2" =~ ^- ]] && jobs=$2
             shift 2 ;;
-        -f|--format)
-            format=1
-            shift ;;
         --release)
             build_type=Release
-            shift ;;
-        -t|--target)
+            shift;;
+        -r|--rustup)
+            rustup=1
+            shift;;
+        --target)
+            [[ ! "$2" =~ ^- ]] && target=$2
+            shift 2 ;;
+        -t|--type)
             [[ ! "$2" =~ ^- ]] && build_type=$2
             shift 2 ;;
         --) # End of input reading
@@ -43,6 +47,11 @@ done
 
 script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+if [ ! -d $script_dir/build ];
+then
+mkdir -p $script_dir/build
+fi
+
 # execute commands
 pushd $script_dir/build
 
@@ -51,34 +60,19 @@ then
 cmake -GNinja -DCMAKE_BUILD_TYPE=$build_type -B./$build_type ..
 fi
 
-if [ $rustup -eq 1 ];
-then
-rustup update
-fi
-
 if [ $format -eq 1 ];
 then
 pushd ..
 cargo fmt
 popd
-ninja format
+ninja format -C $build_type
 fi
 
-pushd $build_type
-echo "ninja shards -j $jobs $*"
-ninja shards -j $jobs $*
-popd
-
-if [ $build_type == "Debug" ];
+if [ $rustup -eq 1 ];
 then
-    cp -p ./$build_type/shards.exe shardsd.exe
-    echo "Done building debug version of shards"
-elif [ $build_type == "Release" ];
-then
-    cp -p ./$build_type/shards.exe shardsr.exe
-    echo "Done building release version of shards"
-else
-    echo "Done building $build_type version of shards"
+rustup update
 fi
+
+ninja $target -C $build_type -j $jobs $*
 
 popd

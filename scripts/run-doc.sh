@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 opt_short="rs"
 opt_long="release,no-generate,serve"
@@ -38,16 +38,13 @@ then
     if [ $build_type == "Debug" ];
     then
         echo "Will build the documentation using the debug version of shards"
-        shards_exe="shardsd.exe"
     else
         echo "Will build the documentation using the release version of shards"
-        shards_exe="shardsr.exe"
         # required on Windows for release build
         . $script_dir/env.sh
     fi
 
-    $script_dir/build/$shards_exe $script_dir/src/tests/infos-docs.edn
-    mv $script_dir/docs/docs/shards/General/UI.md $script_dir/docs/docs/shards/UI/index.md
+    $script_dir/build/$build_type/shards $script_dir/docs/generate.edn
 fi
 
 if [ $serve -eq 1 ];

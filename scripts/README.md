@@ -1,12 +1,8 @@
 # Utility scripts for shards
 
-*Note: the scripts are meant to be used on Windows from a MinGW prompt. They can easily be adapted to work on a Linux shell as well: just edit them and remove the executable extension (`.exe`).*
-
 ## Building
 
 The script `run-build.sh` can be used to build shards with several options. Shards will be built into a child folder of `build/` (e.g. `build/Debug` for the DEBUG version).
-
-In addition a copy of the final executable will be copied into `build` with a different name based on whether in is the DEBUG or the RELEASE build (resp. `shardsd.exe` and `shardsr.exe`). This helps keeping both side by side.
 
 **Debug**
 ```sh
@@ -79,8 +75,6 @@ Assuming shards has been built using `run-build.sh`, we can run a shard script u
 **Run in RELEASE mode**
 ```sh
 ./run-samples.sh
-# or
-./run-samples.sh --release
 ```
 
 ## Running the documentation

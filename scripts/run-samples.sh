@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 opt_short="d"
 opt_long="debug"
@@ -30,10 +30,8 @@ script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 if [ $build_type == "Debug" ];
 then
     echo "Will run the samples using the debug version of shards"
-    shards_exe="shardsd.exe"
 else
     echo "Will run the samples using the release version of shards"
-    shards_exe="shardsr.exe"
     # required on Windows for release build
     . $script_dir/env.sh
 fi
@@ -43,6 +41,6 @@ pushd $script_dir/docs/samples
 for i in $(find shards -name '*.edn');
 do
     echo "Running sample $i";
-    $script_dir/build/$shards_exe run-sample.edn --file "$i" > >(tee "$i.log");
+    $script_dir/build/$build_type/shards $script_dir/docs/samples/run-sample.edn --file "$i" > >(tee "$i.log");
 done
 popd
