@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
-opt_short="d"
-opt_long="debug"
+opt_short="dlp:"
+opt_long="debug,looped,pattern:,negative"
 
 OPTS=$(getopt -o "$opt_short" -l "$opt_long" -- "$@")
 
@@ -9,17 +9,26 @@ eval set -- "$OPTS"
 
 # default values
 build_type=Release
+looped=false
+pattern=
+negative=
 
 # get args
 while true
 do
     case "$1" in
-        -r|--release)
-            build_type=Release
-            shift ;;
         -d|--debug)
             build_type=Debug
             shift ;;
+        -l|--looped)
+            looped=true
+            shift;;
+		-p|--pattern)
+            [[ ! "$2" =~ ^- ]] && pattern="-path $2"
+            shift 2 ;;
+		--negative)
+            negative="!"
+            shift;;
         --) # End of input reading
             shift; break ;;
     esac
@@ -38,9 +47,9 @@ fi
 
 # execute commands
 pushd $script_dir/docs/samples
-for i in $(find shards -name '*.edn');
+for i in $(find shards -name '*.edn' $negative $pattern);
 do
-    echo "Running sample $i";
-    $script_dir/build/$build_type/shards $script_dir/docs/samples/run-sample.edn --file "$i" > >(tee "$i.log");
+    echo "running sample $i";
+    $script_dir/build/$build_type/shards $script_dir/docs/samples/run-sample.edn --looped $looped --file "$i" > >(tee "$i.log");
 done
 popd

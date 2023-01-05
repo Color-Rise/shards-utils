@@ -77,6 +77,11 @@ Assuming shards has been built using `run-build.sh`, we can run a shard script u
 ./run-samples.sh
 ```
 
+**Run only UI samples**
+```sh
+./run-samples.sh --looped --pattern '*UI*'
+```
+
 ## Running the documentation
 
 **Generating with `mkdocs`**
